@@ -35,6 +35,9 @@ def pay_keyboard(shop: Shop, order: Order) -> InlineKeyboardMarkup:
 
 
 async def send_payment(message: Message, shop: Shop, telegram_id: int, email: str | None) -> None:
+    if not shop.cfg.payments_enabled:
+        await message.answer(shop.fmt(texts.PAYMENTS_SOON))
+        return
     try:
         order = await shop.start_purchase(telegram_id, email)
     except (YooKassaError, OSError) as e:
@@ -109,7 +112,7 @@ async def buy(call: CallbackQuery, shop: Shop, state: FSMContext):
         return
 
     email = await shop.db.get_email(user.id)
-    if shop.cfg.receipt_enabled and not email:
+    if shop.cfg.payments_enabled and shop.cfg.receipt_enabled and not email:
         await state.set_state(Checkout.waiting_email)
         await call.message.answer(texts.ASK_EMAIL)
         return

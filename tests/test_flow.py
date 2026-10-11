@@ -168,5 +168,15 @@ class FlowTest(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(await self.db.access_order(STRANGER))
 
 
+    async def test_demo_mode_without_keys(self):
+        from dataclasses import replace
+        from app.handlers import send_payment
+        self.shop.cfg = replace(self.shop.cfg, yookassa_shop_id="", yookassa_secret_key="")
+        msg, answers = self.message(BUYER)
+        await send_payment(msg, self.shop, BUYER, None)
+        self.assertIn("подключается", answers[-1])
+        self.assertIsNone(await self.db.open_order(BUYER))
+
+
 if __name__ == "__main__":
     unittest.main()

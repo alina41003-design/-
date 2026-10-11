@@ -14,6 +14,8 @@ log = logging.getLogger(__name__)
 async def payment_checker(shop: Shop) -> None:
     """Раз в N секунд перепроверяет неоплаченные заказы в ЮKassa.
     Если уведомление (webhook) потерялось, покупатель всё равно получит доступ."""
+    if not shop.cfg.payments_enabled:
+        return
     while True:
         await asyncio.sleep(shop.cfg.check_interval_sec)
         try:

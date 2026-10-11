@@ -44,6 +44,11 @@ class Config:
     check_interval_sec: int
     reminder_minutes: int
 
+    @property
+    def payments_enabled(self) -> bool:
+        """Ключи ЮKassa ещё не выданы — бот работает в демо-режиме (без оплаты)."""
+        return bool(self.yookassa_shop_id and self.yookassa_secret_key)
+
 
 def load_config() -> Config:
     admin_ids = tuple(
@@ -58,8 +63,8 @@ def load_config() -> Config:
             "Гайд «Не баночки, а логика: как выбирать уход за волосами по составу»",
         ),
         price=Decimal(os.getenv("PRICE", "490")).quantize(Decimal("0.01")),
-        yookassa_shop_id=_required("YOOKASSA_SHOP_ID"),
-        yookassa_secret_key=_required("YOOKASSA_SECRET_KEY"),
+        yookassa_shop_id=os.getenv("YOOKASSA_SHOP_ID", "").strip(),
+        yookassa_secret_key=os.getenv("YOOKASSA_SECRET_KEY", "").strip(),
         receipt_enabled=_bool("RECEIPT_ENABLED", True),
         vat_code=int(os.getenv("VAT_CODE", "1")),
         webhook_host=os.getenv("WEBHOOK_HOST", "0.0.0.0"),

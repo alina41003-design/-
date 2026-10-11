@@ -48,6 +48,8 @@ async def main() -> None:
     shop.bot_username = (await bot.get_me()).username
     log.info("Бот @%s запущен", shop.bot_username)
     await check_channel(shop)
+    if not cfg.payments_enabled:
+        log.warning("Ключи ЮKassa не заданы: ДЕМО-РЕЖИМ. Кнопка «Купить» видна, но оплата не создаётся.")
 
     runner = web.AppRunner(create_app(shop))
     await runner.setup()
