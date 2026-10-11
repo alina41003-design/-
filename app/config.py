@@ -25,6 +25,7 @@ def _bool(name: str, default: bool) -> bool:
 @dataclass(frozen=True)
 class Config:
     bot_token: str
+    telegram_proxy: str
     channel_id: int
     admin_ids: tuple[int, ...]
 
@@ -56,6 +57,7 @@ def load_config() -> Config:
     )
     return Config(
         bot_token=_required("BOT_TOKEN"),
+        telegram_proxy=os.getenv("TELEGRAM_PROXY", "").strip(),
         channel_id=int(os.getenv("CHANNEL_ID", "").strip() or 0),
         admin_ids=admin_ids,
         product_name=os.getenv(

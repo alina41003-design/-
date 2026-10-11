@@ -4,6 +4,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramAPIError
 from aiohttp import web
@@ -43,7 +44,9 @@ async def main() -> None:
     db = Database(cfg.db_path)
     await db.connect()
     yk = YooKassa(cfg.yookassa_shop_id, cfg.yookassa_secret_key)
-    bot = Bot(cfg.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    # Прокси нужен, если сервер не может достучаться до Telegram напрямую (например, VPS в России)
+    session = AiohttpSession(proxy=cfg.telegram_proxy) if cfg.telegram_proxy else None
+    bot = Bot(cfg.bot_token, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     shop = Shop(bot, db, yk, cfg)
     shop.bot_username = (await bot.get_me()).username
     log.info("Бот @%s запущен", shop.bot_username)
