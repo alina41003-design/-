@@ -1,0 +1,25 @@
+# Запуск всей системы одной командой: docker compose up -d --build
+services:
+  bot:
+    build: .
+    env_file: .env
+    volumes:
+      - ./data:/app/data          # база заказов хранится здесь, на сервере
+    restart: always
+
+  # Caddy сам получает HTTPS-сертификат, чтобы ЮKassa могла присылать уведомления об оплате.
+  caddy:
+    image: caddy:2.10
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - bot
+    restart: always
+
+volumes:
+  caddy_data:
