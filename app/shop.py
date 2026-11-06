@@ -37,8 +37,17 @@ class Shop:
     def price(self) -> str:
         return rub(self.cfg.price)
 
+    @property
+    def title(self) -> str:
+        """Название без слова «Гайд» в начале — для фраз вида «с гайдом «…»»."""
+        name = self.cfg.product_name.strip()
+        if name.lower().startswith("гайд "):
+            name = name[5:].lstrip()
+        return name
+
     def fmt(self, text: str, **extra) -> str:
-        return text.format(product=html.escape(self.cfg.product_name), price=self.price, **extra)
+        return text.format(product=html.escape(self.cfg.product_name),
+                           title=html.escape(self.title), price=self.price, **extra)
 
     def buy_keyboard(self) -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(
