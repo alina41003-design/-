@@ -14,7 +14,7 @@ from aiogram.types import (
 
 from . import texts
 from .db import HAS_ACCESS, Order
-from .shop import Shop
+from .shop import Shop, rub
 from .yookassa import YooKassaError
 
 log = logging.getLogger(__name__)
@@ -203,7 +203,7 @@ async def stats(message: Message, shop: Shop):
         f"Оплачено и выдано: {s.get('issued', 0)}\n"
         f"Отменённые платежи: {s.get('canceled', 0)}\n"
         f"Доступ отозван: {s.get('revoked', 0)}\n"
-        f"Выручка через ЮKassa: {s['revenue']:g} ₽\n"
+        f"Выручка через ЮKassa: {rub(s['revenue'])} ₽\n"
         f"Пытались зайти без оплаты: {s['rejected']} чел."
     )
 

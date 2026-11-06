@@ -14,6 +14,12 @@ from .yookassa import YooKassa
 
 log = logging.getLogger(__name__)
 
+
+def rub(amount) -> str:
+    """490.00 → «490», 490.50 → «490.50»."""
+    value = Decimal(str(amount))
+    return f"{value:.0f}" if value == value.to_integral_value() else f"{value:.2f}"
+
 MEMBER_STATUSES = {"creator", "administrator", "member", "restricted"}
 
 
@@ -29,7 +35,7 @@ class Shop:
 
     @property
     def price(self) -> str:
-        return f"{self.cfg.price:g}"
+        return rub(self.cfg.price)
 
     def fmt(self, text: str, **extra) -> str:
         return text.format(product=html.escape(self.cfg.product_name), price=self.price, **extra)
@@ -142,7 +148,7 @@ class Shop:
         except TelegramAPIError:
             pass
         text = texts.ADMIN_NEW_SALE.format(
-            amount=f"{Decimal(order.amount):g}", user=user,
+            amount=rub(order.amount), user=user,
             tg_id=order.telegram_id, order_id=order.id,
         )
         for admin_id in self.cfg.admin_ids:
